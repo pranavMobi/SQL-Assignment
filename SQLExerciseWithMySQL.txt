@@ -55,6 +55,7 @@ Q10 Use JOIN to display the first and last names, as well as the address, of eac
 Q1 Which actor has appeared in the most films? (‘107', 'GINA', 'DEGENERES', '42')
 :- 
 
+
 -------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
 Q2 What is the average length of films by category? (16 rows) 
 :-
