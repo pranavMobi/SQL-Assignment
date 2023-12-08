@@ -54,23 +54,85 @@ Q10 Use JOIN to display the first and last names, as well as the address, of eac
 
 Q1 Which actor has appeared in the most films? (‘107', 'GINA', 'DEGENERES', '42')
 :- 
+select
+    actor.actor_id,
+    actor.first_name,
+    actor.last_name,
+    COUNT(film_actor.actor_id) AS film_count
+FROM 
+    actor
+JOIN 
+    film_actor ON actor.actor_id = film_actor.actor_id
+GROUP BY 
+    actor.actor_id, actor.first_name, actor.last_name
+ORDER BY 
+    film_count DESC
+LIMIT 1;
+
 
 
 -------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
 Q2 What is the average length of films by category? (16 rows) 
 :-
-
+select
+    category.name AS category_name,
+    AVG(film.length) AS average_length
+FROM 
+    category
+JOIN 
+    film_category ON category.category_id = film_category.category_id
+JOIN 
+    film ON film_category.film_id = film.film_id
+GROUP BY 
+    category.name;
 -------------------------------------------------------------------x----------------------------------------------x----------------------------------------------
 Q3 Which film categories are long? (5 rows) 
-:-
+:-SELECT 
+    category.name AS category_name,
+    AVG(film.length) AS average_length
+FROM 
+    category
+JOIN 
+    film_category ON category.category_id = film_category.category_id
+JOIN 
+    film ON film_category.film_id = film.film_id
+GROUP BY 
+    category.category_id, category.name
+HAVING 
+    AVG(film.length) > 120;
+
 
 -------------------------------------------------------------------x----------------------------------------------x----------------------------------------------
 Q4 How many copies of the film “Hunchback Impossible” exist in the inventory system? (6) 
 :-
+select
+	film.title,
+    COUNT(*) AS film_copies
+FROM 
+    inventory
+JOIN 
+    film ON inventory.film_id = film.film_id
+WHERE 
+    film.title = 'Hunchback Impossible';
 
 -------------------------------------------------------------------x----------------------------------------------x----------------------------------------------
 Q5 Using the tables “payment” and “customer” and the JOIN command, list the total paid by each customer. List the customers alphabetically by last name (599 rows)
 :-
+SELECT 
+    customer.customer_id,
+    customer.last_name,
+    customer.first_name,
+    SUM(payment.amount) AS total_paid
+FROM 
+    customer
+JOIN 
+    payment ON customer.customer_id = payment.customer_id
+GROUP BY 
+    customer.customer_id, customer.last_name, customer.first_name
+ORDER BY 
+    customer.last_name, customer.first_name;
+
+
 
 -------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
 
@@ -180,6 +242,39 @@ INSERT INTO `employees` (`EMPLOYEE_ID`, `FIRST_NAME`, `LAST_NAME`, `EMAIL`, `PHO
 ('115', 'Alexander', 'Khoo', 'AKHOO', '515.127.4562', '1987-07-02', 'PU_CLERK', '3100.00', '0.00', '114', '30'), 
 ('116', 'Shelli', 'Baida', 'SBAIDA', '515.127.4563', '1987-07-03', 'PU_CLERK', '2900.00', '0.00', '114', '30'), 
 ('117', 'Sigal', 'Tobias', 'STOBIAS', '515.127.4564', '1987-07-04', 'PU_CLERK', '2800.00', '0.00', '114', '30'); 
-Q1 Write a query to display Employee id and First Name of an employee whose dept_id = 100. (Use:Sub-query)(6 rows) 
-Q2. Write a query to display the dept_id, maximum salary, of all the departments whose maximum salary is greater than the average salary. (USE: SUB-QUERY) (11 rows) 
-Q3 Write a query to display department name and, department id of the employees whose salary is less than 35000. .(USE:SUB-QUERY)(11 rows) 
+-------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
+Q1 Write a query to display Employee id and First Name of an employee whose dept_id = 100.  
+:-
+select
+    EMPLOYEE_ID,
+    FIRST_NAME
+FROM 
+    employees
+WHERE 
+    DEPARTMENT_ID = 100;
+-------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
+Q2. Write a query to display the dept_id, maximum salary, of all the departments whose maximum salary is greater than the average salary. 
+:-
+select
+    DEPARTMENT_ID,
+    MAX(SALARY) AS MAX_SALARY
+FROM 
+    employees
+GROUP BY 
+    DEPARTMENT_ID
+HAVING 
+    MAX(SALARY) > (SELECT AVG(SALARY) FROM employees);
+
+-------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
+Q3 Write a query to display department name and, department id of the employees whose salary is less than 35000.  
+:-
+select
+    DEPARTMENT_ID,
+    (SELECT DEPARTMENT_NAME FROM departments WHERE DEPARTMENT_ID = employees.DEPARTMENT_ID) AS DEPARTMENT_NAME
+FROM 
+    employees
+WHERE 
+    SALARY < 35000;
+-------------------------------------------------------------------x----------------------------------------------x---------------------------------------------- 
+
+
